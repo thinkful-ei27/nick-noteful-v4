@@ -1,3 +1,9 @@
 language: node_js
 node_js: node
-services: mongodb
+services:
+  - mongodb
+addons:
+  sonarcloud:
+    organization: "cklanac-github"
+script:
+  - sonar-scanner
