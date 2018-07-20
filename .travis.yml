@@ -7,3 +7,4 @@ addons:
     organization: "cklanac-github"
 script:
   - sonar-scanner
+  - npm test
