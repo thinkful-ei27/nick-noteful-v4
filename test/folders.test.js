@@ -9,8 +9,7 @@ const sinon = require('sinon');
 const app = require('../server');
 const Folder = require('../models/folder');
 const Note = require('../models/note');
-const seedFolders = require('../db/seed/folders');
-const seedNotes = require('../db/seed/notes');
+const { folders, notes } = require('../db/data');
 const { TEST_MONGODB_URI } = require('../config');
 
 chai.use(chaiHttp);
@@ -20,27 +19,33 @@ const sandbox = sinon.createSandbox();
 describe('Noteful API - Folders', function () {
 
   before(function () {
-    return mongoose.connect(TEST_MONGODB_URI)
-      .then(() => mongoose.connection.db.dropDatabase());
+    return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true })
+      .then(() => Promise.all([
+        Note.deleteMany(),
+        Folder.deleteMany()
+      ]));
   });
 
   beforeEach(function () {
     return Promise.all([
-      Folder.insertMany(seedFolders),
-      Folder.createIndexes(),
-      Note.insertMany(seedNotes),
+      Folder.insertMany(folders),
+      Note.insertMany(notes),
+      // Folder.createIndexes(),
     ]);
   });
 
   afterEach(function () {
     sandbox.restore();
-    return mongoose.connection.db.dropDatabase();
+    return Promise.all([
+      Note.deleteMany(), 
+      Folder.deleteMany()
+    ]);
   });
 
   after(function () {
     return mongoose.disconnect();
   });
-
+  
   describe('GET /api/folders', function () {
 
     it('should return a list sorted with the correct number of folders', function () {

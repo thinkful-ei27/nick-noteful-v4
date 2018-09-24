@@ -8,31 +8,28 @@ const Note = require('../models/note');
 const Folder = require('../models/folder');
 const Tag = require('../models/tag');
 
-const seedNotes = require('../db/seed/notes');
-const seedFolders = require('../db/seed/folders');
-const seedTags = require('../db/seed/tags');
+const { folders, notes, tags } = require('../db/data');
 
 console.log(`Connecting to mongodb at ${MONGODB_URI}`);
-mongoose.connect(MONGODB_URI)
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
   .then(() => {
-    console.info('Dropping Database');
-    return mongoose.connection.db.dropDatabase();
+    console.info('Delete Data');
+    return Promise.all([
+      Note.deleteMany(),
+      Folder.deleteMany(),
+      Tag.deleteMany(),
+    ]);
   })
   .then(() => {
     console.info('Seeding Database');
     return Promise.all([
-
-      Note.insertMany(seedNotes),
-
-      Folder.insertMany(seedFolders),
-      Folder.createIndexes(),
-
-      Tag.insertMany(seedTags),
-      Tag.createIndexes()
-
+      Note.insertMany(notes),
+      Folder.insertMany(folders),
+      Tag.insertMany(tags)
     ]);
   })
-  .then(() => {
+  .then(results => {
+    console.log('Inserted', results);
     console.info('Disconnecting');
     return mongoose.disconnect();
   })

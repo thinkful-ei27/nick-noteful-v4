@@ -9,8 +9,7 @@ const sinon = require('sinon');
 const app = require('../server');
 const Tag = require('../models/tag');
 const Note = require('../models/note');
-const seedTags = require('../db/seed/tags');
-const seedNotes = require('../db/seed/notes');
+const { notes, tags } = require('../db/data');
 const { TEST_MONGODB_URI } = require('../config');
 
 chai.use(chaiHttp);
@@ -20,21 +19,26 @@ const sandbox = sinon.createSandbox();
 describe('Noteful API - Tags', function () {
 
   before(function () {
-    return mongoose.connect(TEST_MONGODB_URI)
-      .then(() => mongoose.connection.db.dropDatabase());
+    return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true })
+      .then(() => Promise.all([
+        Note.deleteMany(),
+        Tag.deleteMany(),
+      ]));
   });
 
   beforeEach(function () {
     return Promise.all([
-      Tag.insertMany(seedTags),
-      Tag.createIndexes(),
-      Note.insertMany(seedNotes)
+      Tag.insertMany(tags),
+      Note.insertMany(notes)
     ]);
   });
 
   afterEach(function () {
     sandbox.restore();
-    return mongoose.connection.db.dropDatabase();
+    return Promise.all([
+      Note.deleteMany(),
+      Tag.deleteMany(),
+    ]);
   });
 
   after(function () {
