@@ -22,7 +22,7 @@ describe('Noteful API - Tags', function () {
     return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true })
       .then(() => Promise.all([
         Note.deleteMany(),
-        Tag.deleteMany(),
+        Tag.deleteMany()
       ]));
   });
 
@@ -37,7 +37,7 @@ describe('Noteful API - Tags', function () {
     sandbox.restore();
     return Promise.all([
       Note.deleteMany(),
-      Tag.deleteMany(),
+      Tag.deleteMany()
     ]);
   });
 

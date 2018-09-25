@@ -29,8 +29,7 @@ describe('Noteful API - Folders', function () {
   beforeEach(function () {
     return Promise.all([
       Folder.insertMany(folders),
-      Note.insertMany(notes),
-      // Folder.createIndexes(),
+      Note.insertMany(notes)
     ]);
   });
 

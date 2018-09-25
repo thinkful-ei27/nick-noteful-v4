@@ -24,7 +24,7 @@ describe('Noteful API - Notes', function () {
       .then(() => Promise.all([
         Note.deleteMany(),
         Folder.deleteMany(),
-        Tag.deleteMany(),
+        Tag.deleteMany()
       ]));
   });
 
@@ -41,7 +41,7 @@ describe('Noteful API - Notes', function () {
     return Promise.all([
       Note.deleteMany(),
       Folder.deleteMany(),
-      Tag.deleteMany(),
+      Tag.deleteMany()
     ]);
   });
 
