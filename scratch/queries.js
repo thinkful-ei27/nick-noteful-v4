@@ -5,7 +5,7 @@ const { MONGODB_URI } = require('../config');
 
 const Note = require('../models/note');
 
-mongoose.connect(MONGODB_URI)
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useCreateIndex : true })
   .then(() => {
 
     /**
