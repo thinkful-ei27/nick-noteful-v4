@@ -5,7 +5,7 @@ const User = require('../models/user');
 
 const localStrategy = new LocalStrategy((username, password, done) => {
   let user;
-  console.log('localStrategy ran');
+  console.log('localStrategy')
   User.findOne( { username })
     .then(results => {
         console.log('local strategy ran');
@@ -17,7 +17,9 @@ const localStrategy = new LocalStrategy((username, password, done) => {
                 location: 'username'
             });
         }
-        const isValid = user.validatePassword(password);
+        return user.validatePassword(password);
+    })
+    .then(isValid => {
         if (!isValid) {
             return Promise.reject({
                 reason: 'LoginError',

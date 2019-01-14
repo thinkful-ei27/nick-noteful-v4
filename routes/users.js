@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post('/', (req, res, next) => {
     const {fullname, username, password} = req.body;
-    const newUser = {fullname, username, password};
+    // const newUser = {fullname, username, password};
     console.log('users router ran');
     if(!username){
         const err = new Error('User name is required');
@@ -24,15 +24,23 @@ router.post('/', (req, res, next) => {
         err.status = 400;
         return next(err);
     }
-    User.create(newUser)
-      .then((result) => {
-          res.json(result).status(201);
+
+    return User.hashPassword(password)
+      .then(digest => {
+          const newUser = {
+              username,
+              password: digest,
+              fullname
+          };
+          return User.create(newUser);
+      })
+      .then(result => {
+          return res.status(201).location(`http://${req.headers.host}/api/users/${result.id}`).json(result);
       })
       .catch(err => {
-          console.log(err);
           if(err.code === 11000) {
-            err = new Error('User name already exists');
-            err.status = 400;
+              err = new Error('The username already exists');
+              err.status = 400;
           }
           next(err);
       });
