@@ -13,15 +13,24 @@ router.post('/', (req, res, next) => {
     const {fullname, username, password} = req.body;
     // const newUser = {fullname, username, password};
     console.log('users router ran');
-    if(!username){
-        const err = new Error('User name is required');
-        err.status = 400;
+    const requiredFields = ['username', 'password'];
+    const missingField = requiredFields.find(field => !(field in req.body));
+    if (missingField) {
+        const err = new Error(`Missing '${missingField}' in request body`);
+        err.status = 422;
         return next(err);
     }
-
-    if(!password){
-        const err = new Error('Password is required');
-        err.status = 400;
+    const stringFields = ['usuername', 'password', 'fullname'];
+    const nonStringField = stringFields.find(field => field in req.body && typeof req.body[field] !== 'string');
+    if(nonStringField){
+        const err = new Error(`'${nonStringField}' must be a string`);
+        err.status = 422;
+        return next(err);
+    }
+    const hasWhiteSpace = requiredFields.find(field => req.body[field][0] === ' ' || req.body[field][req.body[field].length - 1] === ' ');
+    if(hasWhiteSpace){
+        const err = new Error(`'${hasWhiteSpace}' must not begin or end with an empty space`);
+        err.status = 422;
         return next(err);
     }
 
