@@ -20,19 +20,34 @@ router.post('/', (req, res, next) => {
         err.status = 422;
         return next(err);
     }
-    const stringFields = ['usuername', 'password', 'fullname'];
+    
+    const stringFields = ['username', 'password', 'fullname'];
     const nonStringField = stringFields.find(field => field in req.body && typeof req.body[field] !== 'string');
     if(nonStringField){
         const err = new Error(`'${nonStringField}' must be a string`);
         err.status = 422;
         return next(err);
     }
+    
     const hasWhiteSpace = requiredFields.find(field => req.body[field][0] === ' ' || req.body[field][req.body[field].length - 1] === ' ');
     if(hasWhiteSpace){
         const err = new Error(`'${hasWhiteSpace}' must not begin or end with an empty space`);
         err.status = 422;
         return next(err);
     }
+
+    if(username.length < 1){
+        const err = new Error(`'username' must be at least 1 character`);
+        err.status = 422;
+        return next(err);
+    }
+
+    if(password.length > 72 || password.length < 8){
+        const err = new Error(`'password' must be between 8 and 72 characters in length'`);
+        err.status = 422;
+        return next(err);
+    }
+
 
     return User.hashPassword(password)
       .then(digest => {
