@@ -7,7 +7,7 @@ const { MONGODB_URI } = require('../config');
 const Note = require('../models/note');
 const Folder = require('../models/folder');
 const Tag = require('../models/tag');
-
+const User = require('../models/user');
 const { folders, notes, tags } = require('../db/data');
 
 console.log(`Connecting to mongodb at ${MONGODB_URI}`);
@@ -18,6 +18,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useCreateIndex : true })
       Note.deleteMany(),
       Folder.deleteMany(),
       Tag.deleteMany(),
+      User.deleteMany()
     ]);
   })
   .then(() => {
