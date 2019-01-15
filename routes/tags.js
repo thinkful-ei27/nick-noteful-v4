@@ -7,6 +7,11 @@ const Tag = require('../models/tag');
 const Note = require('../models/note');
 
 const router = express.Router();
+const passport = require('passport');
+//Below protects endpoints using JWT strategy
+router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
+
+
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {

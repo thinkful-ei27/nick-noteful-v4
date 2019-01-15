@@ -6,12 +6,12 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const localStrategy = require('./passport/local');
 const { PORT, MONGODB_URI } = require('./config');
-
 const notesRouter = require('./routes/notes');
 const foldersRouter = require('./routes/folders');
 const tagsRouter = require('./routes/tags');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
+const jwtStrategy = require('./passport/jwt');
 // Create an Express application
 const app = express();
 
@@ -27,6 +27,7 @@ app.use(express.static('public'));
 app.use(express.json());
 
 passport.use(localStrategy);
+passport.use(jwtStrategy);
 
 // Mount routers
 app.use('/api/notes', notesRouter);
