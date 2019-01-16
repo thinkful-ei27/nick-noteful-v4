@@ -178,8 +178,12 @@ router.delete('/:id', (req, res, next) => {
   }
   //Will not return error message for wrong userId
   Note.findOneAndDelete({_id: id, userId})
-    .then(() => {
+    .then((result) => {
+      if(result){
       res.sendStatus(204);
+      } else {
+        next();
+      }
     })
     .catch(err => {
       next(err);
