@@ -176,7 +176,7 @@ router.delete('/:id', (req, res, next) => {
     err.status = 400;
     return next(err);
   }
-  //Will not return error message for wrong userId
+  
   Note.findOneAndDelete({_id: id, userId})
     .then((result) => {
       if(result){

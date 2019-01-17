@@ -18,8 +18,19 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useCreateIndex : true })
       Note.deleteMany(),
       Folder.deleteMany(),
       Tag.deleteMany(),
-      User.deleteMany()
+      User.deleteMany(),
+      //The above is probably unneccessary
+      mongoose.connection.db.dropDatabase()
     ]);
+  })
+  .then(() => {
+    console.info('Creating Indexes');
+    return Promise.all([
+      User.ensureIndexes(),
+      Folder.ensureIndexes(),
+      Tag.ensureIndexes(),
+      Note.ensureIndexes()
+    ])
   })
   .then(() => {
     console.info('Seeding Database...');

@@ -5,10 +5,8 @@ const User = require('../models/user');
 
 const localStrategy = new LocalStrategy((username, password, done) => {
   let user;
-  console.log('localStrategy')
   User.findOne( { username })
     .then(results => {
-        console.log('local strategy ran');
         user = results;
         if(!user) {
             return Promise.reject({
