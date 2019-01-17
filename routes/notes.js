@@ -4,7 +4,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const Note = require('../models/note');
-const Folder = require('../models/folder')
+const Folder = require('../models/folder');
+const Tag = require('../models/tag');
 const passport = require('passport');
 const router = express.Router();
 //Below protects endpoints using JWT strategy
@@ -37,6 +38,7 @@ const validateFolderUser = function(req, res, next) {
       }
       )
     }
+  next();
   };
 
 const validateTagProperty = function(req, res, next) {
@@ -48,6 +50,7 @@ const validateTagProperty = function(req, res, next) {
     }
     next();
   }
+  next();
 }
 
 const validateTagIds = function(req, res, next) {
@@ -58,6 +61,23 @@ const validateTagIds = function(req, res, next) {
       err.status = 400;
       return next(err);
     }
+    next();
+  }
+  next();
+}
+
+const validateTagUser = function(req, res, next) {
+  if(req.body.tags){
+    req.body.tags.forEach((tagg) => {
+      Tag.find({ userId: req.body.userId, _id: tagg}).count()
+        .then((count) => {
+          if(count === 0){
+            const err = new Error(`'${tagg}' is not a valid tag`);
+            err.status = 400;
+            return next(err);
+          }
+        })
+      })
     next();
   }
   next();
@@ -131,7 +151,7 @@ router.get('/:id', (req, res, next) => {
 
 
 /* ========== POST/CREATE AN ITEM ========== */
-router.post('/', validateFolderId, validateFolderUser, validateTagProperty, validateTagIds, (req, res, next) => {
+router.post('/', validateFolderId, validateFolderUser, validateTagProperty, validateTagIds, validateTagUser, (req, res, next) => {
   const { title, content, folderId, tags } = req.body;
   const userId = req.user.id;
   /***** Never trust users - validate input *****/
@@ -157,7 +177,6 @@ router.post('/', validateFolderId, validateFolderUser, validateTagProperty, vali
 
   Note.create(newNote)
     .then(result => {
-      console.log("Haven't errored yet!");
       res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
     .catch(err => {
