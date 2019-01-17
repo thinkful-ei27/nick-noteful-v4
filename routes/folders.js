@@ -10,6 +10,16 @@ const passport = require('passport');
 const router = express.Router();
 
 
+
+const validateFolderId = function(req, res, next){
+  if(!mongoose.Types.ObjectId.isValid(req.params.id)){
+    const err = new Error('The `id` is not valid');
+    err.status = 400;
+    return next(err);
+  }
+  next();
+};
+
 //Below protects endpoints using JWT strategy
 router.use('/', passport.authenticate('jwt', {session: false, failWithError: true}));
 /* ========== GET/READ ALL ITEMS ========== */
@@ -26,15 +36,11 @@ const userId = req.user.id;
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
-router.get('/:id', (req, res, next) => {
+router.get('/:id', validateFolderId, (req, res, next) => {
   const { id } = req.params;
   const userId = req.user.id;
   /***** Never trust users - validate input *****/
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is not valid');
-    err.status = 400;
-    return next(err);
-  }
+  
 
   Folder.findOne({_id: id, userId: userId})
     .then(result => {
@@ -76,17 +82,12 @@ router.post('/', (req, res, next) => {
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', (req, res, next) => {
+router.put('/:id', validateFolderId, (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
   const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is not valid');
-    err.status = 400;
-    return next(err);
-  }
 
   if (!name) {
     const err = new Error('Missing `name` in request body');
@@ -114,15 +115,10 @@ router.put('/:id', (req, res, next) => {
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', validateFolderId, (req, res, next) => {
   const { id } = req.params;
   const userId = req.user.id;
   /***** Never trust users - validate input *****/
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error('The `id` is not valid');
-    err.status = 400;
-    return next(err);
-  }
 
   // ON DELETE SET NULL equivalent
   const folderRemovePromise = Folder.findOneAndDelete({_id: id, userId: userId});
