@@ -73,7 +73,7 @@ const validateTagUser = function(req, res, next) {
     return Tag.countDocuments({_id: {$in: tags}, userId})
       .then((result) => {
         if(tags.length > result){
-          const err = new Error('Please let this work');
+          const err = new Error('The tags array contains an invalid id');
           err.status = 400;
           return next(err);
         }
@@ -189,7 +189,7 @@ router.post('/', validateFolderId, validateFolderUser, validateTagProperty, vali
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', validateFolderId, validateFolderUser, validateTagProperty, validateTagIds, (req, res, next) => {
+router.put('/:id', validateFolderId, validateFolderUser, validateTagProperty, validateTagIds, validateTagUsers, (req, res, next) => {
   const { id } = req.params;
   const userId = req.user.id;
   const toUpdate = {};
