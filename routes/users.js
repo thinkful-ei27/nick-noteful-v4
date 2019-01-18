@@ -47,14 +47,13 @@ router.post('/', (req, res, next) => {
         err.status = 422;
         return next(err);
     }
-    
 
     return User.hashPassword(password)
       .then(digest => {
           const newUser = {
               username,
               password: digest,
-              fullname
+              fullname: fullname.trim()
           };
           return User.create(newUser);
       })

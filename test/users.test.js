@@ -18,6 +18,9 @@ describe('Noteful API - Users', function () {
   const username = 'exampleUser';
   const password = 'examplePass';
   const fullname = 'Example User';
+  
+  let token;
+  let user;
 
   before(function () {
     return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true, useCreateIndex : true })
