@@ -103,7 +103,7 @@ describe('Noteful API - Folders', function () {
 
   });
 
-  describe.only('GET /api/folders/:id', function () {
+  describe('GET /api/folders/:id', function () {
 
     it('should return correct folder', function () {
       
@@ -166,12 +166,13 @@ describe('Noteful API - Folders', function () {
   });
 
   describe('POST /api/folders', function () {
-
+    
     it('should create and return a new item when provided valid data', function () {
       const newItem = { name: 'newFolder' };
       let body;
       return chai.request(app)
         .post('/api/folders')
+        .set('Authorization', `Bearer ${token}`)
         .send(newItem)
         .then(function (res) {
           body = res.body;
@@ -179,7 +180,7 @@ describe('Noteful API - Folders', function () {
           expect(res).to.have.header('location');
           expect(res).to.be.json;
           expect(body).to.be.a('object');
-          expect(body).to.have.all.keys('id', 'name', 'createdAt', 'updatedAt');
+          expect(body).to.have.all.keys('id', 'name', 'createdAt', 'updatedAt', 'userId');
           return Folder.findById(body.id);
         })
         .then(data => {
@@ -194,6 +195,7 @@ describe('Noteful API - Folders', function () {
       const newItem = {};
       return chai.request(app)
         .post('/api/folders')
+        .set('Authorization', `Bearer ${token}`)
         .send(newItem)
         .then(res => {
           expect(res).to.have.status(400);
@@ -207,6 +209,7 @@ describe('Noteful API - Folders', function () {
       const newItem = { name: '' };
       return chai.request(app)
         .post('/api/folders')
+        .set('Authorization', `Bearer ${token}`)
         .send(newItem)
         .then(res => {
           expect(res).to.have.status(400);
@@ -220,7 +223,9 @@ describe('Noteful API - Folders', function () {
       return Folder.findOne()
         .then(data => {
           const newItem = { name: data.name };
-          return chai.request(app).post('/api/folders').send(newItem);
+          return chai.request(app).post('/api/folders')
+            .set('Authorization', `Bearer ${token}`)
+            .send(newItem);
         })
         .then(res => {
           expect(res).to.have.status(400);
@@ -236,6 +241,7 @@ describe('Noteful API - Folders', function () {
       const newItem = { name: 'newFolder' };
       return chai.request(app)
         .post('/api/folders')
+        .set('Authorization', `Bearer ${token}`)
         .send(newItem)
         .then(res => {
           expect(res).to.have.status(500);

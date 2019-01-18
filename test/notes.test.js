@@ -12,8 +12,7 @@ const Note = require('../models/note');
 const Folder = require('../models/folder');
 const { folders, notes, tags } = require('../db/data');
 const { TEST_MONGODB_URI } = require('../config');
-const jwt = require('jsonwebtoken');
-const {JWT_SECRET, JWT_EXPIRY} = require('../config');
+
 chai.use(chaiHttp);
 const expect = chai.expect;
 const sandbox = sinon.createSandbox();
