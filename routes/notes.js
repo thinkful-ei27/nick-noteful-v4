@@ -17,7 +17,7 @@ const validateFolderId = function(req, res, next){
     err.status = 400;
     return next(err);
   }
-  next();
+  return next();
 };
 
 const validateFolderUser = function(req, res, next) {
@@ -26,19 +26,19 @@ const validateFolderUser = function(req, res, next) {
 
   //This is searching through the folder collection, counting folders with that userId AND folderId
   if(folderId){
-    Folder.find({ userId: userId, _id: folderId}).count()
+    return Folder.find({ userId: userId, _id: folderId}).count()
       .then((count) => {
         if(count === 0) {
           const err = new Error('The `folderId` is not valid');
           err.status = 400;
           return next(err);
         } else {
-          next();
+          return next();
         }
       }
       )
     }
-  next();
+  return next();
   };
 
 const validateTagProperty = function(req, res, next) {
@@ -46,51 +46,55 @@ const validateTagProperty = function(req, res, next) {
     if(!Array.isArray(req.body.tags)){
       const err = new Error(`The 'tags' property must be an array`);
       err.status = 400;
-      next(err);
+      return next(err);
     }
-    next();
+    return next();
   }
-  next();
+  return next();
 }
 
 const validateTagIds = function(req, res, next) {
   if(req.body.tags){
     const badIds = req.body.tags.filter((tag) => !mongoose.Types.ObjectId.isValid(tag));
-    if(badIds.length) {
+    if(badIds.length > 0) {
       const err = new Error('The `tags` array contains an invalid `id`');
       err.status = 400;
       return next(err);
     }
-    next();
+    return next();
   }
-  next();
+  return next();
 }
 
 const validateTagUser = function(req, res, next) {
   if(req.body.tags){
-    req.body.tags.forEach((tagg) => {
-      Tag.find({ userId: req.body.userId, _id: tagg}).count()
-        .then((count) => {
-          if(count === 0){
-            const err = new Error(`'${tagg}' is not a valid tag`);
-            err.status = 400;
-            return next(err);
-          }
-        })
-      })
-    next();
+    const userId = req.user.id;
+    const tags = req.body.tags;
+    return Tag.countDocuments({_id: {$in: tags}, userId})
+      .then((result) => {
+        if(tags.length > result){
+          const err = new Error('Please let this work');
+          err.status = 400;
+          return next(err);
+        }
+        return next();
+      });
+    }
+  return next();
   }
-  next();
-}
-
-// if (toUpdate.tags) {
-//   const badIds = toUpdate.tags.filter((tag) => !mongoose.Types.ObjectId.isValid(tag));
-//   if (badIds.length) {
-//     const err = new Error('The `tags` array contains an invalid `id`');
+      
+        
+// return Folder.find({ userId: userId, _id: folderId}).count()
+// .then((count) => {
+//   if(count === 0) {
+//     const err = new Error('The `folderId` is not valid');
 //     err.status = 400;
 //     return next(err);
+//   } else {
+//     return next();
 //   }
 // }
+// )
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', validateFolderId, validateFolderUser, validateTagProperty, validateTagIds, (req, res, next) => {

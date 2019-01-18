@@ -49,7 +49,7 @@ app.use((err, req, res, next) => {
     res.status(err.status).json(errBody);
   } else {
     //remove me later
-    console.log(err);
+    console.log(`custom error handler is running ${err}`);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
