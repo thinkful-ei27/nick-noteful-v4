@@ -703,7 +703,7 @@ describe('Noteful API - Notes', function () {
 
   });
 
-  describe.only('DELETE /api/notes/:id', function () {
+  describe('DELETE /api/notes/:id', function () {
 
     it('should delete an existing document and respond with 204', function () {
       let data;
