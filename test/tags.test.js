@@ -250,16 +250,13 @@ describe('Noteful API - Tags', function () {
     it('should return an error when given a duplicate name', function () {
       return Tag.findOne({userId: user.id})
         .then(data => {
-          console.log(data);
           const newItem = { name: data.name };
-          console.log(newItem);
           return chai.request(app)
             .post('/api/tags')
             .set('Authorization', `Bearer ${token}`)
             .send(newItem);
         })
         .then(res => {
-          console.log(res.body);
           expect(res).to.have.status(400);
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
