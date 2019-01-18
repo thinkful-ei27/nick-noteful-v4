@@ -189,7 +189,7 @@ router.post('/', validateFolderId, validateFolderUser, validateTagProperty, vali
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', validateFolderId, validateFolderUser, validateTagProperty, validateTagIds, validateTagUsers, (req, res, next) => {
+router.put('/:id', validateFolderId, validateFolderUser, validateTagProperty, validateTagIds, validateTagUser, (req, res, next) => {
   const { id } = req.params;
   const userId = req.user.id;
   const toUpdate = {};

@@ -43,11 +43,11 @@ router.post('/', (req, res, next) => {
     }
 
     if(password.length > 72 || password.length < 8){
-        const err = new Error(`'password' must be between 8 and 72 characters in length'`);
+        const err = new Error(`'password' must be between 8 and 72 characters in length`);
         err.status = 422;
         return next(err);
     }
-
+    
 
     return User.hashPassword(password)
       .then(digest => {
