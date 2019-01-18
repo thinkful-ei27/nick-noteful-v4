@@ -213,21 +213,21 @@ describe('Noteful API - Notes', function () {
 
   });
 
-  describe('GET /api/notes/:id', function () {
+  describe.only('GET /api/notes/:id', function () {
 
     it('should return correct notes', function () {
       let data;
-      return Note.findOne()
+      return Note.findOne({userId: user.id})
         .then(_data => {
           data = _data;
-          return chai.request(app).get(`/api/notes/${data.id}`);
+          return chai.request(app).get(`/api/notes/${data.id}`).set('Authorization', `Bearer ${token}`);
         })
         .then((res) => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           // Note: folderId, tags and content are optional
-          expect(res.body).to.include.all.keys('id', 'title', 'createdAt', 'updatedAt');
+          expect(res.body).to.include.all.keys('id', 'title', 'createdAt', 'updatedAt', 'userId');
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
@@ -239,6 +239,7 @@ describe('Noteful API - Notes', function () {
     it('should respond with status 400 and an error message when `id` is not valid', function () {
       return chai.request(app)
         .get('/api/notes/NOT-A-VALID-ID')
+        .set('Authorization', `Bearer ${token}`)
         .then(res => {
           expect(res).to.have.status(400);
           expect(res.body.message).to.equal('The `id` is not valid');
@@ -249,6 +250,7 @@ describe('Noteful API - Notes', function () {
       // The string "DOESNOTEXIST" is 12 bytes which is a valid Mongo ObjectId
       return chai.request(app)
         .get('/api/notes/DOESNOTEXIST')
+        .set('Authorization', `Bearer ${token}`)
         .then(res => {
           expect(res).to.have.status(404);
         });
@@ -256,9 +258,9 @@ describe('Noteful API - Notes', function () {
 
     it('should catch errors and respond properly', function () {
       sandbox.stub(Note.schema.options.toJSON, 'transform').throws('FakeError');
-      return Note.findOne()
+      return Note.findOne({userId: user.id})
         .then(data => {
-          return chai.request(app).get(`/api/notes/${data.id}`);
+          return chai.request(app).get(`/api/notes/${data.id}`).set('Authorization', `Bearer ${token}`);
         })
         .then(res => {
           expect(res).to.have.status(500);
