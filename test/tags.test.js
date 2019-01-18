@@ -285,7 +285,7 @@ describe('Noteful API - Tags', function () {
 
   });
 
-  describe.only('PUT /api/tags/:id', function () {
+  describe('PUT /api/tags/:id', function () {
 
     it('should update the tag', function () {
       const updateItem = { name: 'Updated Name' };
@@ -416,11 +416,12 @@ describe('Noteful API - Tags', function () {
 
     it('should delete an existing tag and respond with 204', function () {
       let data;
-      return Tag.findOne()
+      return Tag.findOne({userId: user.id})
         .then(_data => {
           data = _data;
           return chai.request(app)
-            .delete(`/api/tags/${data.id}`);
+            .delete(`/api/tags/${data.id}`)
+            .set('Authorization', `Bearer ${token}`);
         })
         .then(function (res) {
           expect(res).to.have.status(204);
@@ -434,17 +435,18 @@ describe('Noteful API - Tags', function () {
 
     it('should delete an existing tag and remove tag reference from note', function () {
       let tagId;
-      return Note.findOne({ tags: { $exists: true, $ne: [] } })
+      return Note.findOne({userId: user.id, tags: { $exists: true, $ne: [] } })
         .then(data => {
           tagId = data.tags[0];
 
           return chai.request(app)
-            .delete(`/api/tags/${tagId}`);
+            .delete(`/api/tags/${tagId}`)
+            .set('Authorization', `Bearer ${token}`);
         })
         .then(function (res) {
           expect(res).to.have.status(204);
           expect(res.body).to.be.empty;
-          return Note.count({ tags: tagId });
+          return Note.count({tags: tagId });
         })
         .then(count => {
           expect(count).to.equal(0);
@@ -454,6 +456,7 @@ describe('Noteful API - Tags', function () {
     it('should respond with a 400 for an invalid id', function () {
       return chai.request(app)
         .delete('/api/tags/NOT-A-VALID-ID')
+        .set('Authorization', `Bearer ${token}`)
         .then(res => {
           expect(res).to.have.status(400);
           expect(res.body.message).to.equal('The `id` is not valid');
@@ -462,9 +465,9 @@ describe('Noteful API - Tags', function () {
 
     it('should catch errors and respond properly', function () {
       sandbox.stub(express.response, 'sendStatus').throws('FakeError');
-      return Tag.findOne()
+      return Tag.findOne({userId: user.id})
         .then(data => {
-          return chai.request(app).delete(`/api/tags/${data.id}`);
+          return chai.request(app).delete(`/api/tags/${data.id}`).set('Authorization', `Bearer ${token}`);
         })
         .then(res => {
           expect(res).to.have.status(500);
